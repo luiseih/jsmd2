@@ -10,6 +10,8 @@ import sqlite3
 # Ask user for config file location,
 # sqlite3 database file name and location,
 # Names for tables (offer defaults).
+# Default app to see documents stored in
+# database.
 
 # Check for sqlite3 database and,
 # if it doesn't exist, create it.
