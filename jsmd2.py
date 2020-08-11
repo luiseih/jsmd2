@@ -3,7 +3,7 @@
 from pathlib import Path
 import os
 import configparser
-import sqlite3
+import Classes.application
 
 # Check for configuration file and,
 # if it doesn't exist, create it.
@@ -50,9 +50,8 @@ def main():
         with open('jsmd2.conf', 'w') as configfile:
             config.write(configfile)
 
-    
+    print(Classes.application.runMe())    
 
 if __name__ == '__main__':
     main()
-
 
