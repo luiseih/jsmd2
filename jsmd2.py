@@ -3,6 +3,25 @@
 from pathlib import Path
 import os
 import configparser
+import sqlite3
+
+# Check for configuration file and,
+# if it doesn't exist, create it.
+# Ask user for config file location,
+# sqlite3 database file name and location,
+# Names for tables (offer defaults).
+
+# Check for sqlite3 database and,
+# if it doesn't exist, create it.
+# Use location and names previously
+# provided by user. Check config file.
+
+# Create main menu. Ask user what
+# he wants to do.
+
+# Create independent file modules for
+# working with business, job, application,
+# resumes, cover letters (maybe?).
 
 
 def main():
