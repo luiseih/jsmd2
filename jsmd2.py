@@ -27,7 +27,7 @@ import Classes.application
 
 
 def main():
-
+    # Create config file if it doesn't exist already.
     home = str(Path.home())
     full_path = os.path.join(home, ".config")
     if not os.path.exists(full_path):
@@ -44,14 +44,22 @@ def main():
         config['bitbucket.org']['User'] = 'hg'
         config['topsecret.server.com'] = {}
         topsecret = config['topsecret.server.com']
-        topsecret['Port'] = '50022'                # mutates the parser
-        topsecret['ForwardX11'] = 'no'             # same here
+        topsecret['Port'] = '50022'  # mutates the parser
+        topsecret['ForwardX11'] = 'no'  # same here
         config['DEFAULT']['ForwardX11'] = 'yes'
         with open('jsmd2.conf', 'w') as configfile:
             config.write(configfile)
 
+<<<<<<< Updated upstream
     print(Classes.application.runMe())    
 
 if __name__ == '__main__':
     main()
 
+=======
+    # Create database if it doesn't exist already
+
+
+if __name__ == '__main__':
+    main()
+>>>>>>> Stashed changes
