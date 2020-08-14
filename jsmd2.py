@@ -26,22 +26,21 @@ def main():
             os.system('clear')
         return
 
-    class Configuration:
-        def check():
-            config = configparser.ConfigParser()
-            if os.path.isfile('jsmd2.conf'):
-                config.read('jsmd2.conf')
-                database_location = config['DEFAULT']['DatabaseLocation']
-                database_name = config['DEFAULT']['DatabaseName']
-            else:
-                database_location, database_name = Menu.configuration()
-                config['DEFAULT'] = {'DatabaseLocation': database_location,
+    def configuration_check():
+        config = configparser.ConfigParser()
+        if os.path.isfile('jsmd2.conf'):
+            config.read('jsmd2.conf')
+            database_location = config['DEFAULT']['DatabaseLocation']
+            database_name = config['DEFAULT']['DatabaseName']
+        else:
+            database_location, database_name = Menu.configuration()
+            config['DEFAULT'] = {'DatabaseLocation': database_location,
                                  'DatabaseName': database_name}
-                with open('jsmd2.conf', 'w') as configfile:
-                    config.write(configfile)
-            conn, c = Database.connect(database_location, database_name)
-            Database.init(conn, c)
-            return conn, c
+            with open('jsmd2.conf', 'w') as configfile:
+                config.write(configfile)
+        conn, c = Database.connect(database_location, database_name)
+        Database.init(conn, c)
+        return conn, c
 
     class Database:
         def connect(database_location, database_name):
@@ -307,7 +306,7 @@ def main():
             return
 
 
-    conn, c = Configuration.check()
+    conn, c = configuration_check()
     Menu.main()
 
 if __name__ == '__main__':
