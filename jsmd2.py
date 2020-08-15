@@ -308,6 +308,8 @@ def main():
 
 
     conn, c = Configuration.check()
+    print("SQLite version",sqlite3.sqlite_version)
+    time.sleep(2)
     Menu.main()
 
 if __name__ == '__main__':
