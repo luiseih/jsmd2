@@ -26,7 +26,7 @@ def main():
             os.system('clear')
         return
 
-    def configuration_check(db):
+    def configuration_check():
         config = configparser.ConfigParser()
         if os.path.isfile('jsmd2.conf'):
             config.read('jsmd2.conf')
@@ -38,135 +38,90 @@ def main():
                                  'DatabaseName': database_name}
             with open('jsmd2.conf', 'w') as configfile:
                 config.write(configfile)
-        db.setDB_location(database_location)
-        db.setDB_name(database_name)
-        db.connect()
-        db.init()
+            os.chdir(database_location)
+            conn = sqlite3.connect(database_name)
+            create_database(conn)
+        return database_location, database_name
+
+    def create_database(conn):
+        conn.executescript("""
+        DROP TABLE IF EXISTS company;
+        DROP TABLE IF EXISTS job;
+        DROP TABLE IF EXISTS application;
+        DROP TABLE IF EXISTS cover_letter;
+        DROP TABLE IF EXISTS resume;
+        DROP TABLE IF EXISTS status;
+        CREATE TABLE company(
+        id INTEGER PRIMARY KEY NOT NULL,
+        updated_on TEXT NOT NULL,
+        name TEXT NOT NULL,
+        address1 TEXT,
+        address2 TEXT,
+        city TEXT,
+        state TEXT DEFAULT 'VIC' NOT NULL,
+        postal_code INTEGER,
+        country TEXT DEFAULT 'AUSTRALIA' NOT NULL);
+        CREATE TABLE job(
+        id INTEGER PRIMARY KEY NOT NULL,
+        updated_on TEXT NOT NULL,
+        from_company INTEGER NOT NULL,
+        name TEXT NOT NULL,
+        requirements BLOB NOT NULL,
+        FOREIGN KEY(from_company) REFERENCES company(id));
+        CREATE TABLE application(
+        id INTEGER PRIMARY KEY NOT NULL,
+        updated_on TEXT NOT NULL,
+        job INTEGER NOT NULL,
+        sent INTEGER NOT NULL,
+        cover_letter INTEGER NOT NULL,
+        resume INTEGER NOT NULL,
+        status INTEGER NOT NULL,
+        notes TEXT NOT NULL,
+        FOREIGN KEY(job) REFERENCES job(id),
+        FOREIGN KEY(cover_letter) REFERENCES cover_letter(id),
+        FOREIGN KEY(resume) REFERENCES resume(id),
+        FOREIGN KEY(status) REFERENCES status(id));
+        CREATE TABLE cover_letter(
+        id INTEGER PRIMARY KEY NOT NULL,
+        updated_on TEXT NOT NULL,
+        name TEXT NOT NULL,
+        document BLOB NOT NULL);
+        CREATE TABLE resume(
+        id INTEGER PRIMARY KEY NOT NULL,
+        updated_on TEXT NOT NULL,
+        name TEXT NOT NULL,
+        document BLOB NOT NULL);
+        CREATE TABLE status(
+        id INTEGER PRIMARY KEY NOT NULL,
+        status TEXT NOT NULL);
+        """)
         return
 
-    class Database:
-        def __init__(self):
-            self.database_location = ''
-            self.database_name = ''
-            self.conn = ''
-            self.c = ''
+    def application_read():
+        pass
 
-        def setDB_location(self, database_location):
-            self.database_location = database_location
-            return
+    def application_write():
+        pass
 
-        def setDB_name(self, database_name):
-            self.database_name = database_name
-            return
+    def company_read():
+        pass
+    
+    def company_write():
+        pass
 
-        def setConn(self, conn):
-            self.conn = conn
-            return
+    def cover_letter_read():
+        pass
 
-        def setC(self, c):
-            self.c = c
-            return
+    def cover_letter_write():
+        pass
 
-        def getConn(self):
-            return self.conn
+    def job_read():
+        pass
+    
+    def job_write():
+        pass
 
-        def getC(self):
-            return self.c
-
-        def connect(self):
-            os.chdir(self.database_location)
-            self.conn = sqlite3.connect(self.database_name)
-            self.c = self.conn.cursor()
-            return
-
-        def init(self):
-            self.c.executescript("""
-            DROP TABLE IF EXISTS company;
-            DROP TABLE IF EXISTS job;
-            DROP TABLE IF EXISTS application;
-            DROP TABLE IF EXISTS cover_letter;
-            DROP TABLE IF EXISTS resume;
-            DROP TABLE IF EXISTS status;
-
-            CREATE TABLE company(
-            id INTEGER PRIMARY KEY NOT NULL,
-            updated_on TEXT NOT NULL,
-            name TEXT NOT NULL,
-            address1 TEXT,
-            address2 TEXT,
-            city TEXT,
-            state TEXT DEFAULT 'VIC' NOT NULL,
-            postal_code INTEGER,
-            country TEXT DEFAULT 'AUSTRALIA' NOT NULL);
-
-            CREATE TABLE job(
-            id INTEGER PRIMARY KEY NOT NULL,
-            updated_on TEXT NOT NULL,
-            from_company INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            requirements BLOB NOT NULL,
-            FOREIGN KEY(from_company) REFERENCES company(id));
-
-            CREATE TABLE application(
-            id INTEGER PRIMARY KEY NOT NULL,
-            updated_on TEXT NOT NULL,
-            job INTEGER NOT NULL,
-            sent INTEGER NOT NULL,
-            cover_letter INTEGER NOT NULL,
-            resume INTEGER NOT NULL,
-            status INTEGER NOT NULL,
-            notes TEXT NOT NULL,
-            FOREIGN KEY(job) REFERENCES job(id),
-            FOREIGN KEY(cover_letter) REFERENCES cover_letter(id),
-            FOREIGN KEY(resume) REFERENCES resume(id),
-            FOREIGN KEY(status) REFERENCES status(id));
-
-            CREATE TABLE cover_letter(
-            id INTEGER PRIMARY KEY NOT NULL,
-            updated_on TEXT NOT NULL,
-            name TEXT NOT NULL,
-            document BLOB NOT NULL);
-
-            CREATE TABLE resume(
-            id INTEGER PRIMARY KEY NOT NULL,
-            updated_on TEXT NOT NULL,
-            name TEXT NOT NULL,
-            document BLOB NOT NULL);
-
-            CREATE TABLE status(
-            id INTEGER PRIMARY KEY NOT NULL,
-            status TEXT NOT NULL);
-            """)
-            return
-
-       
-    class Application:
-        def read():
-            pass
-
-        def write():
-            pass
-
-    class Company:
-        def read():
-            pass
-
-        def write():
-            pass
-
-    class Cover_letter:
-        def read():
-            pass
-        def write():
-            pass
-
-
-    class Job:
-        def read():
-            pass
-        def write():
-            pass
-
+### Menu Section ###
     def menu_header():
         clear()
         print()
@@ -306,7 +261,6 @@ def main():
         return
 
     def menu_goodbye():
-        db.getConn().close()
         print()
         print("Fingers crossed. Good luck!")
         print()
@@ -319,25 +273,25 @@ def main():
             pass
 
     def status_read():
-        for row in db.getConn().execute('SELECT * FROM status'):
+        for row in conn.execute('SELECT * FROM status;'):
             print(row)
         return
 
     def status_write(status):
-        try:
-            db.getConn().execute('INSERT INTO status(status) VALUES(?)', status)
-            db.getConn().commit()
-            print("Saving changes...")
-            time.sleep(2)
-        except sqlite3.Error as error:
-            print("Failed to save data",error)
+        conn.execute('INSERT INTO status(status) VALUES(?);', status)
+        conn.commit()
         return
 
-    db = Database()
-    configuration_check(db)
+    location, db = configuration_check()
+    os.chdir(location)
+    conn = sqlite3.connect(db)
     print("SQLite version",sqlite3.sqlite_version)
-    time.sleep(2)
+    time.sleep(1)
     menu_main()
+    conn.commit()
+    conn.close()
 
 if __name__ == '__main__':
     main()
+
+#  vim: set ts=8 sw=4 tw=110 et :
