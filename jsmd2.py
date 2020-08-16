@@ -1,18 +1,22 @@
 #!/usr/bin/python3
 
-''' JSMD2 is an application to manage job applications.
-JSMD2 stands for Job Search Multi Document version 2.
+'''
+JSMD2 is an application to manage job applications.
 It acts as a front end for SQLite3.
 '''
 
-__author__    = "Luis E. I. Herrera"
+__author__ = "Luis E. I. Herrera"
 __copyright__ = "MIT License 2020"
 
 # TODO:
 #
+# Create menus for working with job,
+# application, resumes, and cover letters.
+#
 # Default app to see documents stored in
 # database.
 #
+# This is getting really long.
 # Create independent file modules for
 # working with business, job, application,
 # resumes, cover letters (maybe?).
@@ -22,7 +26,7 @@ import time
 import sqlite3
 import datetime
 import configparser
-from pathlib import Path
+
 
 def main():
     # define clear screen function
@@ -47,12 +51,16 @@ def main():
                                  'DatabaseName': database_name}
             with open('jsmd2.conf', 'w') as configfile:
                 config.write(configfile)
-            os.chdir(database_location)
-            conn = sqlite3.connect(database_name)
-            create_database(conn)
-        return database_location, database_name
+        os.chdir(database_location)
 
-    def create_database(conn):
+        if os.path.isfile(database_name):
+            connection = sqlite3.connect(database_name)
+        else:
+            connection = sqlite3.connect(database_name)
+            create_database(connection)
+        return connection
+
+    def create_database(connection):
         conn.executescript("""
         DROP TABLE IF EXISTS company;
         DROP TABLE IF EXISTS job;
@@ -112,9 +120,6 @@ def main():
     def application_write():
         pass
 
-    def company_read():
-        pass
-    
     def company_write():
         pass
 
@@ -126,23 +131,23 @@ def main():
 
     def job_read():
         pass
-    
+
     def job_write():
         pass
 
-### Menu Section ###
+    # Menu Section
     def menu_header():
         clear()
         print()
-        print("*"*12,"JSMD2","*"*12)
+        print("*" * 12, "JSMD2", "*" * 12)
         print()
         return
 
     def menu_configuration():
         menu_header()
-        print ("Database Configuration")
+        print("Database Configuration")
         print()
-        print ("*"*30)
+        print("*" * 30)
         database_location = input("Enter sqlite3 database location (ENTER for current folder): ")
         if database_location == "":
             database_location = os.getcwd()
@@ -150,12 +155,12 @@ def main():
         if database_name == "":
             database_name = "jsmd2.db"
         return database_location, database_name
-    
+
     def menu_main():
         menu_header()
         print("Main Menu")
         print()
-        print ("*"*30)
+        print("*" * 30)
         print("1. Work with companies.")
         print("2. Work with job positions.")
         print("3. Work with job applications.")
@@ -188,12 +193,12 @@ def main():
         menu_header()
         print("Companies")
         print()
-        print("*"*30)
+        print("*" * 30)
         print()
         print("Current companies are:")
         company_read()
         print()
-        print("*"*30)
+        print("*" * 30)
         print("1. Add a new company.")
         print("2. Modify a company.")
         print("3. Delete a company.")
@@ -222,35 +227,35 @@ def main():
             cur = conn.cursor()
             cur.execute('SELECT * FROM company WHERE rowid=?', (modify_company,))
             old_company = cur.fetchone()
-            print("What is the company name (",old_company[2],")? ")
+            print("What is the company name (", old_company[2], ")? ")
             name = input()
             if name == "":
                 name = old_company[2]
-            print("What is the company address1 (",old_company[3],")? ")
+            print("What is the company address1 (", old_company[3], ")? ")
             address1 = input()
             if address1 == "":
                 address1 = old_company[3]
-            print("What is the company address2 (",old_company[4],")? ")
+            print("What is the company address2 (", old_company[4], ")? ")
             address2 = input()
             if address2 == "":
                 address2 = old_company[4]
-            print("What is the company city (",old_company[5],")? ")
+            print("What is the company city (", old_company[5], ")? ")
             city = input()
             if city == "":
                 city = old_company[5]
-            print("What is the company state (",old_company[6],")? ")
+            print("What is the company state (", old_company[6], ")? ")
             state = input()
             if state == "":
                 state = old_company[6]
-            print("What is the company post code (",old_company[7],")? ")
+            print("What is the company post code (", old_company[7], ")? ")
             postal_code = input()
             if postal_code == "":
                 postal_code = old_company[7]
-            print("What is the company country (",old_company[8],")? ")
+            print("What is the company country (", old_company[8], ")? ")
             country = input()
             if country == "":
                 country = old_company[8]
-            company_modify(modify_company,name,address1,address2,city,state,postal_code,country)
+            company_modify(modify_company, name, address1, address2, city, state, postal_code, country)
             menu_companies()
         elif choice == "3":
             delete_company = input("Company to delete? ")
@@ -269,51 +274,51 @@ def main():
         elif choice == "7":
             menu_goodbye()
         else:
-            menu_invalid_output()
+            menu_invalid_input()
             menu_companies()
         return
 
-# Company menu header
+    # Company menu header
     def company_read():
         for row in conn.execute('SELECT * FROM company;'):
             print(row)
         return
-       
-# Company menu option 1
+
+    # Company menu option 1
     def company_add(name, address1, address2, city, state, postal_code, country):
         updated_on = datetime.datetime.now().isoformat()
         conn.execute('INSERT INTO company \
                 (updated_on,name,address1,address2,city,state,postal_code,country) \
-                VALUES(?,?,?,?,?,?,?,?);', \
-                (updated_on,name,address1,address2,city,state,postal_code,country))
+                VALUES(?,?,?,?,?,?,?,?);',
+                     (updated_on, name, address1, address2, city, state, postal_code, country))
         conn.commit()
         return
 
-# Company menu option 2
-    def company_modify(modify_company,name,address1,address2,city,state,postal_code,country):
+    # Company menu option 2
+    def company_modify(modify_company, name, address1, address2, city, state, postal_code, country):
         updated_on = datetime.datetime.now().isoformat()
         conn.execute('UPDATE company SET \
         updated_on=?,name=?,address1=?,address2=?,city=?,state=?,postal_code=?,country=? WHERE \
-        rowid=?;',(updated_on,name,address1,address2,city,state,postal_code,country,modify_company))
+        rowid=?;', (updated_on, name, address1, address2, city, state, postal_code, country, modify_company))
         conn.commit()
         return
 
-# Company menu option 3
+    # Company menu option 3
     def company_delete(delete_company):
         conn.execute('DELETE FROM company WHERE rowid=?;', delete_company)
         conn.commit()
         return
 
-# Company menu option 4
+    # Company menu option 4
     def company_last_entries(how_many):
-        for row in conn.execute('SELECT * FROM company ORDER BY rowid DESC LIMIT ?;',how_many):
+        for row in conn.execute('SELECT * FROM company ORDER BY rowid DESC LIMIT ?;', how_many):
             print(row)
-        input("Press ENTER to coninue...")
+        input("Press ENTER to continue...")
         return
 
-# Company menu option 5
+    # Company menu option 5
     def company_search(search_company):
-        for row in conn.execute("SELECT * FROM company WHERE name LIKE ?;", ('%'+search_company+'%',)):
+        for row in conn.execute("SELECT * FROM company WHERE name LIKE ?;", ('%' + search_company + '%',)):
             print(row)
         input("Press ENTER to continue...")
         return
@@ -334,12 +339,12 @@ def main():
         menu_header()
         print("Status options")
         print()
-        print("*"*30)
+        print("*" * 30)
         print()
         print("Current available options are:")
         status_read()
         print()
-        print("*"*30)
+        print("*" * 30)
         print("1. Add a new option.")
         print("2. Modify a previous option.")
         print("3. Delete an option.")
@@ -382,43 +387,43 @@ def main():
         return
 
     class Resume:
-        def read():
-            pass
-        def write():
+        def read(self):
             pass
 
-# Status menu header
+        def write(self):
+            pass
+
+    # Status menu header
     def status_read():
         for row in conn.execute('SELECT * FROM status;'):
             print(row)
         return
 
-# Status menu option 1
+    # Status menu option 1
     def status_write_new(status):
         conn.execute('INSERT INTO status(status) VALUES(?);', status)
         conn.commit()
         return
 
-# Status menu option 2
+    # Status menu option 2
     def status_replace(old_status, new_status):
         conn.execute('UPDATE status SET status=? WHERE rowid=?;', (new_status, old_status))
         conn.commit()
         return
 
-# Status menu option 3
+    # Status menu option 3
     def status_remove(remove_status):
         conn.execute('DELETE FROM status WHERE rowid=?;', remove_status)
         conn.commit()
         return
 
-    location, db = configuration_check()
-    os.chdir(location)
-    conn = sqlite3.connect(db)
-    print("SQLite version",sqlite3.sqlite_version)
+    conn = configuration_check()
+    print("SQLite version", sqlite3.sqlite_version)
     time.sleep(1)
     menu_main()
     conn.commit()
     conn.close()
+
 
 if __name__ == '__main__':
     main()
