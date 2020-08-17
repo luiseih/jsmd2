@@ -15,11 +15,7 @@ __copyright__ = "MIT License 2020"
 #
 # Default app to see documents stored in
 # database.
-#
-# This is getting really long.
-# Create independent file modules for
-# working with business, job, application,
-# resumes, cover letters (maybe?).
+
 
 import menu
 import sqlite3

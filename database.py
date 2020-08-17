@@ -8,9 +8,9 @@ import menu
 
 class Database:
     def __init__(self):
-        self.database_location = ""
-        self.database_name = ""
-        self.dbconnect = ""
+        self.database_location = None
+        self.database_name = None
+        self.dbconnect = None
 
     def configuration_check(self):
         config = configparser.ConfigParser()
@@ -86,4 +86,17 @@ class Database:
         id INTEGER PRIMARY KEY NOT NULL,
         status TEXT NOT NULL);
         """)
-        return
+
+
+def convert_to_binary_data(filename):
+    # Convert digital data to binary format
+    with open(filename, 'rb') as file:
+        blob_data = file.read()
+    return blob_data
+
+
+def write_to_file(data, filename):
+    # Convert binary data to proper format and write it on Hard Disk
+    with open(filename, 'wb') as file:
+        file.write(data)
+    print("Stored blob data into: ", filename, "\n")
