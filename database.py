@@ -14,6 +14,7 @@ class Database:
 
     def configuration_check(self):
         config = configparser.ConfigParser()
+        os.chdir(os.path.expanduser('~/.config/'))
         if os.path.isfile('jsmd2.conf'):
             config.read('jsmd2.conf')
             self.database_location = config['DEFAULT']['DatabaseLocation']

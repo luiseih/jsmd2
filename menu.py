@@ -8,6 +8,7 @@ import company
 import datetime
 import database
 import job
+import PySimpleGUI as sg
 import application
 import cover_letter
 import resume
