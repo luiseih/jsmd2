@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import os
 import time
 import status
 import company
@@ -15,25 +14,6 @@ import resume
 sg.theme('Dark Blue 3')  # please make your windows colorful
 
 
-def clear():
-    # for windows
-    if os.name == 'nt':
-        os.system('cls')
-    # for mac and linux
-    else:
-        os.system('clear')
-    return
-
-
-def header():
-    clear()
-    print()
-    print("*" * 12, "JSMD2", "*" * 12)
-    print()
-    return
-
-
-
 def configuration(current_dir):
     layout = [[sg.Text('Select folder for database')],
               [sg.Input(current_dir), sg.FolderBrowse()],
@@ -42,48 +22,45 @@ def configuration(current_dir):
               [sg.OK(), sg.Cancel()]]
 
     window = sg.Window('Database Location', layout)
+
     event, values = window.read()
-    window.close()
-    database_location = values[0]
-    database_name = values[1]
-    return database_location, database_name
+    if event == sg.WIN_CLOSED or event == 'Cancel':
+        return
+    else:
+        database_location = values[0]
+        database_name = values[1]
+        window.close()
+        return database_location, database_name
 
 
 def main(db):
-    header()
-    print("Main Menu")
-    print()
-    print("*" * 30)
-    print("1. Work with companies.")
-    print("2. Work with job positions.")
-    print("3. Work with job applications.")
-    print("4. Work with resumes.")
-    print("5. Work with cover letters.")
-    print("6. Status options.")
-    print("7. Exit.")
-    print()
-    choice = input("What would you like to do? ")
-    if choice == "1":
+    layout = [[sg.Button('Companies'), sg.Button('Job Positions'), sg.Button('Job Applications')],
+              [sg.Button('Resumes'), sg.Button('Cover Letters'), sg.Button('Status Options'), sg.Button('Exit')]]
+
+    window = sg.Window('Job Search Manager 2', layout)
+
+    event, values = window.read()
+
+    if event == 'Companies':
         companies(db)
-    elif choice == "2":
+    elif event == 'Job Positions':
         jobs(db)
-    elif choice == "3":
+    elif event == 'Job Applications':
         applications(db)
-    elif choice == "4":
+    elif event == 'Resumes':
         resumes(db)
-    elif choice == "5":
+    elif event == 'Cover Letters':
         cover_letters(db)
-    elif choice == "6":
+    elif event == 'Status Options':
         statuses(db)
-    elif choice == "7":
-        goodbye(db)
-    else:
-        invalid_input()
-        main(db)
+    elif event == 'Exit':
+        sg.popup('Fingers crossed. Good luck!')
+        window.close()
+    elif event == sg.WINDOW_CLOSED:
+        window.close()
 
 
 def companies(db):
-    header()
     print("Companies")
     print()
     print("*" * 30)
@@ -182,7 +159,6 @@ def companies(db):
 
 
 def jobs(db):
-    header()
     print("Jobs")
     print()
     print("*" * 30)
@@ -264,42 +240,29 @@ def cover_letters(db):
 
 
 def statuses(db):
-    header()
-    print("Status options")
-    print()
-    print("*" * 30)
-    print()
-    print("Current available options are:")
-    status.read(db)
-    print()
-    print("*" * 30)
-    print("1. Add a new option.")
-    print("2. Modify a previous option.")
-    print("3. Delete an option.")
-    print("4. Go to main menu.")
-    print("5. Exit.")
-    print()
-    choice = input("What would you like to do? ")
-    if choice == "1":
-        status_new = input("Type the new status: "),
-        status.write_new(db, status_new)
-        statuses(db)
-    elif choice == "2":
-        old_status = input("Which option would you like to change? ")
-        new_status = input("What should the new option be? ")
-        status.replace(db, old_status, new_status)
-        statuses(db)
-    elif choice == "3":
-        remove_status = input("Which option would you like to remove? ")
-        status.remove(db, remove_status)
-        statuses(db)
-    elif choice == "4":
+    data = db.read('status')
+    header_list = ['index', 'status']
+
+    layout = [[sg.Text('Current available options are:')],
+              #[sg.Table(values=data, headings=header_list, max_col_width=25, auto_size_columns=True,
+               #         justification='right', num_rows=min(len(data), 20))],
+              [sg.Text(data)],
+              [sg.Button('Add'), sg.Button('Replace'), sg.Button('Remove'), sg.Button('Go Back')]]
+
+    window = sg.Window('JSMD2 - Status', layout)
+
+    event, values = window.read()
+
+    if event == 'Add':
+        pass
+    elif event == 'Replace':
+        pass
+    elif event == 'Remove':
+        pass
+    elif event == 'Go Back':
         main(db)
-    elif choice == "5":
-        goodbye(db)
-    else:
-        invalid_input()
-        statuses(db)
+    elif event == 'WINDOW_CLOSED':
+        window.close()
 
 
 def invalid_input():

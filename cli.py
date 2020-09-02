@@ -265,7 +265,7 @@ def statuses(db):
     print("*" * 30)
     print()
     print("Current available options are:")
-    status.read(db)
+    db.read('status')
     print()
     print("*" * 30)
     print("1. Add a new option.")

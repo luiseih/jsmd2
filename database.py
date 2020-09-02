@@ -3,6 +3,7 @@
 import sqlite3
 import configparser
 import os
+import sys
 import cli
 import gui
 
@@ -27,17 +28,23 @@ class Database:
             else:
                 configuration = gui.configuration(current_dir)
 
-            self.database_location, self.database_name = configuration
-            config['DEFAULT'] = {'DatabaseLocation': self.database_location,
-                                 'DatabaseName': self.database_name}
-            with open('jsmd2.conf', 'w') as configfile:
-                config.write(configfile)
+            try:
+                self.database_location, self.database_name = configuration
+                config['DEFAULT'] = {'DatabaseLocation': self.database_location,
+                                     'DatabaseName': self.database_name}
+                with open('jsmd2.conf', 'w') as configfile:
+                    config.write(configfile)
+                os.chdir(self.database_location)
+
+                self.set_connection(self.database_name)
+                if os.path.isfile(self.database_name):
+                    pass
+                else:
+                    self.create_database()
+            except TypeError:
+                sys.exit()
         os.chdir(self.database_location)
-        if os.path.isfile(self.database_name):
-            self.set_connection(self.database_name)
-        else:
-            self.set_connection(self.database_name)
-            self.create_database()
+        self.set_connection(self.database_name)
 
     def set_connection(self, database_name):
         self.database_connect = sqlite3.connect(database_name)
@@ -94,6 +101,21 @@ class Database:
         id INTEGER PRIMARY KEY NOT NULL,
         status TEXT NOT NULL);
         """)
+
+    def read(self, table):
+        data = []
+        for row in self.database_connect.execute('SELECT * FROM status'):
+            data.append(row)
+        return data
+
+    def add(self):
+        pass
+
+    def modify(self):
+        pass
+
+    def delete(self):
+        pass
 
 
 def convert_to_binary_data(filename):
