@@ -17,18 +17,27 @@ __copyright__ = "MIT License 2020"
 # database.
 
 
-import menu
+import cli
 import sqlite3
 import time
 import database
 
 
+def select_interface():
+    interface = ""
+
+    while interface != "1" and interface !="2":
+        print("1. CLI")
+        print("2. GUI")
+        interface = input("? ")
+
+    return interface
+
 def main():
+    interface = select_interface()
     db = database.Database()
-    db.configuration_check()
-    print("SQLite version", sqlite3.sqlite_version)
-    time.sleep(1)
-    menu.main(db)
+    db.configuration_check(interface)
+    cli.main(db)
 
 
 if __name__ == '__main__':

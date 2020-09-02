@@ -2,13 +2,11 @@
 
 import os
 import time
-import ntpath
 import status
 import company
 import datetime
 import database
 import job
-import PySimpleGUI as sg
 import application
 import cover_letter
 import resume
@@ -32,14 +30,14 @@ def header():
     return
 
 
-def configuration():
+def configuration(current_dir):
     header()
     print("Database Configuration")
     print()
     print("*" * 30)
     database_location = input("Enter sqlite3 database location (ENTER for current folder): ")
     if database_location == "":
-        database_location = os.getcwd()
+        database_location = current_dir
     database_name = input("Enter sqlite3 database name (ENTER for 'jsmd2.db'): ")
     if database_name == "":
         database_name = "jsmd2.db"
@@ -306,7 +304,7 @@ def invalid_input():
 
 
 def goodbye(db):
-    db.dbconnect.close()
+    db.database_connect.close()
     print()
     print("Fingers crossed. Good luck!")
     print()

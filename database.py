@@ -3,16 +3,18 @@
 import sqlite3
 import configparser
 import os
-import menu
+import cli
+import gui
 
 
 class Database:
     def __init__(self):
         self.database_location = None
         self.database_name = None
-        self.dbconnect = None
+        self.database_connect = None
 
-    def configuration_check(self):
+    def configuration_check(self, interface):
+        current_dir = os.getcwd()
         config = configparser.ConfigParser()
         os.chdir(os.path.expanduser('~/.config/'))
         if os.path.isfile('jsmd2.conf'):
@@ -20,7 +22,12 @@ class Database:
             self.database_location = config['DEFAULT']['DatabaseLocation']
             self.database_name = config['DEFAULT']['DatabaseName']
         else:
-            self.database_location, self.database_name = menu.configuration()
+            if interface == "1":
+                configuration = cli.configuration(current_dir)
+            else:
+                configuration = gui.configuration(current_dir)
+
+            self.database_location, self.database_name = configuration
             config['DEFAULT'] = {'DatabaseLocation': self.database_location,
                                  'DatabaseName': self.database_name}
             with open('jsmd2.conf', 'w') as configfile:
@@ -33,10 +40,10 @@ class Database:
             self.create_database()
 
     def set_connection(self, database_name):
-        self.dbconnect = sqlite3.connect(database_name)
+        self.database_connect = sqlite3.connect(database_name)
 
     def create_database(self):
-        self.dbconnect.executescript("""
+        self.database_connect.executescript("""
         DROP TABLE IF EXISTS company;
         DROP TABLE IF EXISTS job;
         DROP TABLE IF EXISTS application;
