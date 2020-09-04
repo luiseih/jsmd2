@@ -17,6 +17,7 @@ __copyright__ = "MIT License 2020"
 # database.
 
 
+import os
 import cli
 import gui
 import database
@@ -37,6 +38,7 @@ def main():
     interface = select_interface()
     db = database.Database()
     db.configuration_check(interface)
+    os.chdir(db.database_location)
     if interface == "1":
         cli.main(db)
     else:

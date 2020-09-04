@@ -240,13 +240,13 @@ def cover_letters(db):
 
 
 def statuses(db):
-    data = db.read('status')
+    data = []
     header_list = ['index', 'status']
 
     layout = [[sg.Text('Current available options are:')],
-              #[sg.Table(values=data, headings=header_list, max_col_width=25, auto_size_columns=True,
-               #         justification='right', num_rows=min(len(data), 20))],
-              [sg.Text(data)],
+              [sg.Table(values=db.read('status'), headings=header_list, auto_size_columns=True,
+                        justification='left', num_rows=min(len(data), 20),display_row_numbers=True,
+                        key='table')],
               [sg.Button('Add'), sg.Button('Replace'), sg.Button('Remove'), sg.Button('Go Back')]]
 
     window = sg.Window('JSMD2 - Status', layout)

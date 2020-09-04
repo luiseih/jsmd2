@@ -34,23 +34,17 @@ class Database:
                                      'DatabaseName': self.database_name}
                 with open('jsmd2.conf', 'w') as configfile:
                     config.write(configfile)
-                os.chdir(self.database_location)
-
-                self.set_connection(self.database_name)
-                if os.path.isfile(self.database_name):
-                    pass
-                else:
-                    self.create_database()
             except TypeError:
                 sys.exit()
         os.chdir(self.database_location)
-        self.set_connection(self.database_name)
-
-    def set_connection(self, database_name):
-        self.database_connect = sqlite3.connect(database_name)
+        if os.path.isfile(self.database_name):
+            pass
+        else:
+            sqlite3.connect(self.database_name)
+            self.create_database()
 
     def create_database(self):
-        self.database_connect.executescript("""
+        sqlite3.connect(self.database_name).executescript("""
         DROP TABLE IF EXISTS company;
         DROP TABLE IF EXISTS job;
         DROP TABLE IF EXISTS application;
@@ -104,18 +98,31 @@ class Database:
 
     def read(self, table):
         data = []
-        for row in self.database_connect.execute('SELECT * FROM status'):
+        command = "SELECT * FROM "+table
+        for row in sqlite3.connect(self.database_name).execute(command):
             data.append(row)
         return data
 
-    def add(self):
-        pass
+    def add(self, table, fields, values):
+        conn = sqlite3.connect(self.database_name)
+        command = "INSERT INTO "+table+"("+', '.join(fields)+") VALUES (\""+', '.join(values)+"\")"
+        conn.execute(command)
+        conn.commit()
 
-    def modify(self):
-        pass
+    def modify(self, table, field, new_status, old_rowid):
+        conn = sqlite3.connect(self.database_name)
+        command = "UPDATE "+table+" SET "+field+"='"+new_status+"' WHERE rowid="+old_rowid
+        conn.execute(command)
+        conn.commit()
 
-    def delete(self):
-        pass
+    def delete(self, table, old_rowid):
+        conn = sqlite3.connect(self.database_name)
+        command = "DELETE FROM "+table+" WHERE rowid="+old_rowid
+        conn.execute(command)
+        conn.commit()
+
+    def close(self):
+        sqlite3.connect(self.database_name).close()
 
 
 def convert_to_binary_data(filename):

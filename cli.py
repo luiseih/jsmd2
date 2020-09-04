@@ -2,14 +2,7 @@
 
 import os
 import time
-import status
-import company
 import datetime
-import database
-import job
-import application
-import cover_letter
-import resume
 
 
 def clear():
@@ -84,7 +77,7 @@ def companies(db):
     print("*" * 30)
     print()
     print("Current companies are:")
-    company.read(db)
+    db.read('company')
     print()
     print("*" * 30)
     print("1. Add a new company.")
@@ -109,8 +102,10 @@ def companies(db):
         country = input("What is the company country? ")
         if country == "":
             country = "AUSTRALIA"
-        company.add(db, updated_on, name, address1, address2, city, state,
-                    postal_code, country)
+        db.add('company', fields=['updated_on', 'name', 'address1', 'address2', 'city', 'state',
+                                  'postal_code', 'country'],
+               values=[updated_on, name, address1, address2, city, state,
+                       postal_code, country])
         companies(db)
     elif choice == "2":
         modify_company = input("What company would you like to modify? ")
@@ -265,7 +260,8 @@ def statuses(db):
     print("*" * 30)
     print()
     print("Current available options are:")
-    db.read('status')
+    for row in db.read('status'):
+        print(str(row[0])+'. '+row[1])
     print()
     print("*" * 30)
     print("1. Add a new option.")
@@ -276,17 +272,17 @@ def statuses(db):
     print()
     choice = input("What would you like to do? ")
     if choice == "1":
-        status_new = input("Type the new status: "),
-        status.write_new(db, status_new)
+        new_status = input("Type the new status: ")
+        db.add(table='status', fields=['status'], values=[new_status])
         statuses(db)
     elif choice == "2":
-        old_status = input("Which option would you like to change? ")
-        new_status = input("What should the new option be? ")
-        status.replace(db, old_status, new_status)
+        rowid = input("Which option would you like to change? ")
+        status = input("What should the new option be? ")
+        db.modify('status', 'status', status, rowid)
         statuses(db)
     elif choice == "3":
-        remove_status = input("Which option would you like to remove? ")
-        status.remove(db, remove_status)
+        rowid = input("Which option would you like to remove? ")
+        db.delete('status', rowid)
         statuses(db)
     elif choice == "4":
         main(db)
@@ -304,7 +300,7 @@ def invalid_input():
 
 
 def goodbye(db):
-    db.database_connect.close()
+    db.close()
     print()
     print("Fingers crossed. Good luck!")
     print()

@@ -1,9 +1,5 @@
 #!/usr/bin/env python3
 
-def read(db):
-    for row in db.database_connect.execute('SELECT * FROM status;'):
-        print(row)
-
 
 # Status menu option 1
 def write_new(db, status):
